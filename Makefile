@@ -21,7 +21,7 @@ SOURCES = $(CORE_SOURCES) $(FUNCTION_SOURCES) $(UTIL_SOURCES) $(DEMO_SOURCES)
 # Main classes
 MAIN_CLASS = hashindex.demo.HashIndexDemo
 FILE_DEMO_CLASS = hashindex.demo.HashIndexDemoWithFile
-
+FRONTEND_CLASS = hashindex.demo.HashIndexUI
 # Default target
 all: compile
 
@@ -36,6 +36,9 @@ $(CLASSES_DIR):
 # Run basic demo
 demo: compile
 	$(JAVA) -cp $(CLASSES_DIR) $(MAIN_CLASS)
+
+frontend: compile
+	$(JAVA) -cp $(CLASSES_DIR) $(FRONTEND_CLASS)
 
 # Run file-based demo
 demo-file: compile
@@ -61,9 +64,10 @@ help:
 	@echo "  compile    - Compile all Java files"
 	@echo "  demo       - Run basic demo"
 	@echo "  demo-file  - Run file-based demo"
+	@echo "  frontend   - Run GUI frontend"
 	@echo "  clean      - Remove build files"
 	@echo "  distclean  - Remove all generated files"
 	@echo "  tree       - Show project structure"
 	@echo "  help       - Show this help"
 
-.PHONY: all compile demo demo-file clean distclean tree help
+.PHONY: all compile demo demo-file frontend clean distclean tree help

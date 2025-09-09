@@ -126,7 +126,7 @@ List<Tuple> tuples = DataLoader.loadWordsFromFile("words.txt", 1000);
 
 ## 🏃‍♂️ Executando as Demonstrações
 
-### Usando Mak
+### Usando Make (Linux/macOS)
 
 ```bash
 # Compile and run basic demo
@@ -135,11 +135,36 @@ make demo
 # Compile and run file-based demo
 make demo-file
 
+# Run GUI frontend
+make frontend
+
 # Show project structure
 make tree
 
 # Clean build files
 make clean
+```
+
+### Windows (cmd/PowerShell)
+
+```bat
+:: Compile
+make.cmd compile
+
+:: Run basic demo
+make.cmd demo
+
+:: Run file-based demo
+make.cmd demo-file
+
+:: Run GUI frontend
+make.cmd frontend
+
+:: Show project structure
+make.cmd tree
+
+:: Clean build files
+make.cmd clean
 ```
 
 ### Manual Compilation
