@@ -1,11 +1,10 @@
 package hashindex.demo;
 
+import java.awt.*;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.event.ActionListener;
-import java.io.File;
 
 /**
  * HashIndexUI (GUI-ONLY)
@@ -187,6 +186,9 @@ public class HashIndexUI extends JFrame {
             ui.setSearchCost(0);
             ui.setScanCost(0);
             ui.setFoundPage(null);
+
+            // Conecta o controller para ligar os botões à lógica
+            new HashIndexController(ui);
         });
     }
 }
