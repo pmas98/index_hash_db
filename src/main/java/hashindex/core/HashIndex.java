@@ -1,8 +1,8 @@
 package hashindex.core;
 
+import hashindex.functions.HashFunction;
 import java.util.ArrayList;
 import java.util.List;
-import hashindex.functions.HashFunction;
 
 public class HashIndex {
     private Table table;
@@ -45,14 +45,22 @@ public class HashIndex {
         int bucketNumber = hashFunction.hash(tuple.getKey(), numberOfBuckets);
         Bucket bucket = buckets.get(bucketNumber);
         
+        if (bucket.getEntryCount() > 0) {
+            collisionCount++;
+        }
+
         if (!bucket.addEntry(tuple.getKey(), pageNumber)) {
-            // Bucket tá cheio
             overflowCount++;
             
-            // overflow: encontra o próximo bucket disponível
             int nextBucket = (bucketNumber + 1) % numberOfBuckets;
             while (nextBucket != bucketNumber) {
                 Bucket nextBucketObj = buckets.get(nextBucket);
+
+                // Count collisions for each unsuccessful probe as well (optional but typical)
+                if (nextBucketObj.getEntryCount() > 0 && nextBucketObj.isFull()) {
+                    collisionCount++;
+                }
+
                 if (nextBucketObj.addEntry(tuple.getKey(), pageNumber)) {
                     break;
                 }
@@ -60,7 +68,6 @@ public class HashIndex {
             }
         }
     }
-
     public double getCollisionRate() {
         int totalEntries = buckets.stream().mapToInt(Bucket::getEntryCount).sum();
         return totalEntries > 0 ? (double) collisionCount / totalEntries : 0.0;
