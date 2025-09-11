@@ -24,7 +24,12 @@ public class HashIndex {
     
     public void buildIndex(List<Tuple> tuples) {
         int totalTuples = tuples.size();
-        this.numberOfBuckets = (int) Math.ceil((double) totalTuples / tuplesPerBucket) + 1;
+        // Choose number of buckets to target a lower load factor (alpha), then round up to next prime.
+        // alpha = totalTuples / (numberOfBuckets * tuplesPerBucket)
+        // => numberOfBuckets >= totalTuples / (alpha * tuplesPerBucket)
+        double targetLoadFactor = 0.70; // 70% occupancy target to reduce clustering/collisions
+        int minBuckets = (int) Math.ceil(totalTuples / (targetLoadFactor * (double) tuplesPerBucket));
+        this.numberOfBuckets = nextPrime(minBuckets);
         
         buckets = new ArrayList<>();
         for (int i = 0; i < numberOfBuckets; i++) {
@@ -124,5 +129,24 @@ public class HashIndex {
     
     public int getOverflowCount() {
         return overflowCount;
+    }
+
+    // Utilities
+    private static int nextPrime(int n) {
+        if (n <= 2) return 2;
+        int candidate = (n % 2 == 0) ? n + 1 : n;
+        while (!isPrime(candidate)) {
+            candidate += 2;
+        }
+        return candidate;
+    }
+
+    private static boolean isPrime(int n) {
+        if (n < 2) return false;
+        if (n % 2 == 0) return n == 2;
+        for (int i = 3; (long) i * i <= n; i += 2) {
+            if (n % i == 0) return false;
+        }
+        return true;
     }
 }

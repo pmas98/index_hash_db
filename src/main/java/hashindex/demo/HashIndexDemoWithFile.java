@@ -1,14 +1,14 @@
 package hashindex.demo;
 
+import hashindex.core.HashIndex;
+import hashindex.core.Tuple;
+import hashindex.functions.DivisionHashFunction;
+import hashindex.functions.HashFunction;
+import hashindex.functions.MultiplicationHashFunction;
+import hashindex.functions.SimpleHashFunction;
+import hashindex.utils.DataLoader;
 import java.io.IOException;
 import java.util.List;
-import hashindex.core.Tuple;
-import hashindex.core.HashIndex;
-import hashindex.functions.HashFunction;
-import hashindex.functions.SimpleHashFunction;
-import hashindex.functions.DivisionHashFunction;
-import hashindex.functions.MultiplicationHashFunction;
-import hashindex.utils.DataLoader;
 
 /**
  * Enhanced demo that can work with the actual 466k words file
