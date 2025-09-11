@@ -39,34 +39,57 @@ public class HashIndex {
 
     private void addTupleToIndex(Tuple tuple) {
         table.addTuple(tuple);
-        
         int pageNumber = table.getPageCount() - 1;
-        
-        int bucketNumber = hashFunction.hash(tuple.getKey(), numberOfBuckets);
-        Bucket bucket = buckets.get(bucketNumber);
-        
-        if (bucket.getEntryCount() > 0) {
-            collisionCount++;
-        }
 
+        int homeBucket = hashFunction.hash(tuple.getKey(), numberOfBuckets);
+        Bucket bucket = buckets.get(homeBucket);
+
+        // Linear probing across buckets. Count collisions as extra probes beyond the first attempt.
+        int probes = 0;
         if (!bucket.addEntry(tuple.getKey(), pageNumber)) {
-            overflowCount++;
-            
-            int nextBucket = (bucketNumber + 1) % numberOfBuckets;
-            while (nextBucket != bucketNumber) {
-                Bucket nextBucketObj = buckets.get(nextBucket);
-
-                // Count collisions for each unsuccessful probe as well (optional but typical)
-                if (nextBucketObj.getEntryCount() > 0 && nextBucketObj.isFull()) {
-                    collisionCount++;
-                }
-
-                if (nextBucketObj.addEntry(tuple.getKey(), pageNumber)) {
+            // Could not insert in home bucket -> overflow chain
+            int nextBucket = (homeBucket + 1) % numberOfBuckets;
+            while (nextBucket != homeBucket) {
+                Bucket candidate = buckets.get(nextBucket);
+                probes++;
+                if (candidate.addEntry(tuple.getKey(), pageNumber)) {
                     break;
                 }
                 nextBucket = (nextBucket + 1) % numberOfBuckets;
             }
         }
+
+        // Update statistics
+        collisionCount += probes;           // number of extra probes performed for this insertion
+        if (probes > 0) {
+            overflowCount++;               // tuple stored away from its home bucket
+        }
+    }
+
+    /** Busca via índice: retorna custo em páginas lidas e página encontrada (se houver). */
+    public ScanResult searchByIndex(String key) {
+        ScanResult res = new ScanResult();
+        if (buckets == null || buckets.isEmpty()) return res;
+
+        int homeBucket = hashFunction.hash(key, numberOfBuckets);
+        int current = homeBucket;
+        do {
+            Bucket b = buckets.get(current);
+            Integer pageIdx = b.findPageNumber(key);
+            if (pageIdx != null) {
+                // Acesso à página de dados
+                res.incPagesRead();
+                res.markFound(pageIdx, -1);
+                return res;
+            }
+            // Se o bucket não está cheio, a cadeia de probing termina aqui (open addressing)
+            if (!b.isFull()) {
+                return res;
+            }
+            current = (current + 1) % numberOfBuckets;
+        } while (current != homeBucket);
+
+        return res;
     }
     public double getCollisionRate() {
         int totalEntries = buckets.stream().mapToInt(Bucket::getEntryCount).sum();

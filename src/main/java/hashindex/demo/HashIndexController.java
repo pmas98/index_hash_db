@@ -1,6 +1,8 @@
 package hashindex.demo;
 
 import hashindex.core.HashIndex;
+import hashindex.core.ScanResult;
+import hashindex.core.TableScanService;
 import hashindex.core.Tuple;
 import hashindex.functions.HashFunction;
 import hashindex.functions.SimpleHashFunction;
@@ -21,6 +23,8 @@ public class HashIndexController {
 
     private void wireActions() {
         ui.addBuildActionListener(e -> onBuildIndex());
+        ui.addSearchActionListener(e -> onSearchByIndex());
+        ui.addScanActionListener(e -> onTableScan());
     }
 
     private void onBuildIndex() {
@@ -56,6 +60,39 @@ public class HashIndexController {
             ui.appendLog("[ERRO] Falha ao construir índice: " + ex.getMessage());
             JOptionPane.showMessageDialog(null, "Erro ao construir índice: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void onSearchByIndex() {
+        if (hashIndex == null) {
+            ui.appendLog("[CTRL] Construa o índice antes de procurar.");
+            return;
+        }
+        String key = ui.getSearchKey();
+        if (key == null || key.isEmpty()) {
+            ui.appendLog("[CTRL] Informe uma chave para buscar.");
+            return;
+        }
+        ScanResult res = hashIndex.searchByIndex(key);
+        ui.setSearchCost(res.getPagesRead());
+        ui.setFoundPage(res.isFound() ? res.getFoundPageIndex() : null);
+        ui.appendLog("[CTRL] Busca por índice '" + key + "' => páginas lidas=" + res.getPagesRead() + (res.isFound()? (", página=" + res.getFoundPageIndex()) : ", não encontrado"));
+    }
+
+    private void onTableScan() {
+        if (hashIndex == null) {
+            ui.appendLog("[CTRL] Construa o índice antes de realizar table scan.");
+            return;
+        }
+        String key = ui.getSearchKey();
+        if (key == null || key.isEmpty()) {
+            ui.appendLog("[CTRL] Informe uma chave para table scan.");
+            return;
+        }
+        TableScanService scanner = new TableScanService(hashIndex.getTable());
+        ScanResult res = scanner.tableScanByKey(key);
+        ui.setScanCost(res.getPagesRead());
+        ui.setFoundPage(res.isFound() ? res.getFoundPageIndex() : null);
+        ui.appendLog("[CTRL] Table scan '" + key + "' => páginas lidas=" + res.getPagesRead() + (res.isFound()? (", página=" + res.getFoundPageIndex()) : ", não encontrado"));
     }
 
     private int parseIntOr(String text, int fallback) {
