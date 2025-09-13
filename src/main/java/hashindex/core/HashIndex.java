@@ -24,10 +24,7 @@ public class HashIndex {
     
     public void buildIndex(List<Tuple> tuples) {
         int totalTuples = tuples.size();
-        // Choose number of buckets to target a lower load factor (alpha), then round up to next prime.
-        // alpha = totalTuples / (numberOfBuckets * tuplesPerBucket)
-        // => numberOfBuckets >= totalTuples / (alpha * tuplesPerBucket)
-        double targetLoadFactor = 0.70; // 70% occupancy target to reduce clustering/collisions
+        double targetLoadFactor = 0.50; 
         int minBuckets = (int) Math.ceil(totalTuples / (targetLoadFactor * (double) tuplesPerBucket));
         this.numberOfBuckets = nextPrime(minBuckets);
         
@@ -49,7 +46,6 @@ public class HashIndex {
         int homeBucket = hashFunction.hash(tuple.getKey(), numberOfBuckets);
         Bucket bucket = buckets.get(homeBucket);
 
-        // Linear probing across buckets. Count collisions as extra probes beyond the first attempt.
         int probes = 0;
         if (!bucket.addEntry(tuple.getKey(), pageNumber)) {
             // Could not insert in home bucket -> overflow chain
@@ -64,14 +60,12 @@ public class HashIndex {
             }
         }
 
-        // Update statistics
-        collisionCount += probes;           // number of extra probes performed for this insertion
+        collisionCount += probes;
         if (probes > 0) {
-            overflowCount++;               // tuple stored away from its home bucket
+            overflowCount++;
         }
     }
 
-    /** Busca via índice: retorna custo em páginas lidas e página encontrada (se houver). */
     public ScanResult searchByIndex(String key) {
         ScanResult res = new ScanResult();
         if (buckets == null || buckets.isEmpty()) return res;
@@ -82,12 +76,10 @@ public class HashIndex {
             Bucket b = buckets.get(current);
             Integer pageIdx = b.findPageNumber(key);
             if (pageIdx != null) {
-                // Acesso à página de dados
                 res.incPagesRead();
                 res.markFound(pageIdx, -1);
                 return res;
             }
-            // Se o bucket não está cheio, a cadeia de probing termina aqui (open addressing)
             if (!b.isFull()) {
                 return res;
             }
@@ -96,6 +88,7 @@ public class HashIndex {
 
         return res;
     }
+    
     public double getCollisionRate() {
         int totalEntries = buckets.stream().mapToInt(Bucket::getEntryCount).sum();
         return totalEntries > 0 ? (double) collisionCount / totalEntries : 0.0;

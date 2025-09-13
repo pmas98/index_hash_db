@@ -3,9 +3,6 @@ package hashindex.core;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Mapeia chave para endereço de página
- */
 public class Bucket {
     private int bucketNumber;
     private List<BucketEntry> entries;

@@ -4,6 +4,7 @@ import hashindex.core.HashIndex;
 import hashindex.core.ScanResult;
 import hashindex.core.TableScanService;
 import hashindex.core.Tuple;
+import hashindex.functions.DivisionHashFunction;
 import hashindex.functions.HashFunction;
 import hashindex.functions.SimpleHashFunction;
 import hashindex.utils.DataLoader;
@@ -31,7 +32,7 @@ public class HashIndexController {
         String file = ui.getDataFilePath();
         int pageSize = parseIntOr(ui.getPageSizeText(), 100);
         int tuplesPerBucket = parseIntOr(ui.getBucketSizeText(), 4);
-        HashFunction hashFunction = new SimpleHashFunction();
+        HashFunction hashFunction = new DivisionHashFunction();
 
         try {
             ui.appendLog("[CTRL] Carregando dados de: " + file);

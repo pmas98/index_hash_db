@@ -6,37 +6,20 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-/**
- * HashIndexUI (GUI-ONLY)
- *
- * Somente a interface gráfica exigida no enunciado:
- * - 4 inputs: arquivo de dados, tamanho da página, tamanho do bucket (FR), chave de busca
- * - Botões: Construir Índice, Procurar (Índice), Table Scan
- * - Área de log/saída
- * - Painel de estatísticas (NB, páginas, total de tuplas, colisões, overflows, taxas, custos, página encontrada)
- *
- * Não há implementação de lógica, backend, leitura de arquivo ou hashing aqui.
- * Foram expostos getters para ler os inputs e setters para atualizar as estatísticas.
- * Também há métodos para permitir que a equipe conecte ActionListeners aos botões.
- */
 public class HashIndexUI extends JFrame {
 
-    // Campos de entrada (4 inputs)
     private final JTextField txtFile = new JTextField();
     private final JTextField txtPageSize = new JTextField("100");
     private final JTextField txtBucketSize = new JTextField("4");
     private final JTextField txtSearchKey = new JTextField();
 
-    // Botões 
     private final JButton btnBrowse = new JButton("Escolher arquivo...");
     private final JButton btnBuild = new JButton("Construir Índice");
     private final JButton btnSearch = new JButton("Procurar (Índice)");
     private final JButton btnScan = new JButton("Table Scan");
 
-    //Saída / Log
     private final JTextArea txtLog = new JTextArea();
 
-    // Estatísticas (somente labels para a GUI) 
     private final JLabel lblNb = new JLabel("NB (buckets): -");
     private final JLabel lblPages = new JLabel("Páginas: -");
     private final JLabel lblTotalTuples = new JLabel("Total de Tuplas: -");
@@ -49,7 +32,7 @@ public class HashIndexUI extends JFrame {
     private final JLabel lblFoundPage = new JLabel("Página encontrada: -");
 
     public HashIndexUI() {
-        super("Índice Hash - Interface (GUI Only)");
+        super("Índice Hash - Interface");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout(10, 10));
 
@@ -60,7 +43,6 @@ public class HashIndexUI extends JFrame {
         setMinimumSize(new Dimension(1100, 650));
         setLocationRelativeTo(null);
 
-        // Ação padrão do botão "Escolher arquivo..." (apenas preenche o campo de caminho)
         btnBrowse.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileFilter(new FileNameExtensionFilter("Text files", "txt", "csv"));
@@ -68,11 +50,6 @@ public class HashIndexUI extends JFrame {
                 txtFile.setText(chooser.getSelectedFile().getAbsolutePath());
             }
         });
-
-        // Ações padrão dos outros botões: apenas logam que a ação precisa ser conectada pela equipe
-        btnBuild.addActionListener(e -> appendLog("[GUI] Clique em 'Construir Índice' (conectar lógica da equipe)."));
-        btnSearch.addActionListener(e -> appendLog("[GUI] Clique em 'Procurar (Índice)' (conectar lógica da equipe)."));
-        btnScan.addActionListener(e -> appendLog("[GUI] Clique em 'Table Scan' (conectar lógica da equipe)."));
     }
 
     private JPanel buildTopPanel() {
@@ -135,21 +112,16 @@ public class HashIndexUI extends JFrame {
         return p;
     }
 
-    //Métodos utilitários
-
-    /** Anexa mensagem na área de log. */
     public void appendLog(String s) {
         txtLog.append(s + "\n");
         txtLog.setCaretPosition(txtLog.getDocument().getLength());
     }
 
-    /** Getters dos inputs. */
     public String getDataFilePath() { return txtFile.getText().trim(); }
     public String getPageSizeText() { return txtPageSize.getText().trim(); }
     public String getBucketSizeText() { return txtBucketSize.getText().trim(); }
     public String getSearchKey() { return txtSearchKey.getText().trim(); }
 
-    /** Setters das estatísticas (a lógica externa pode atualizar). */
     public void setNbBuckets(int nb) { lblNb.setText("NB (buckets): " + nb); }
     public void setPages(int pages) { lblPages.setText("Páginas: " + pages); }
     public void setTotalTuples(int total) { lblTotalTuples.setText("Total de Tuplas: " + total); }
@@ -164,18 +136,14 @@ public class HashIndexUI extends JFrame {
         else lblFoundPage.setText("Página encontrada: " + page);
     }
 
-    /** Permite que a equipe conecte as ações dos botões. */
     public void addBuildActionListener(ActionListener l) { btnBuild.addActionListener(l); }
     public void addSearchActionListener(ActionListener l) { btnSearch.addActionListener(l); }
     public void addScanActionListener(ActionListener l) { btnScan.addActionListener(l); }
-
-    //Main apenas para visualizar a GUI
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             HashIndexUI ui = new HashIndexUI();
             ui.setVisible(true);
 
-            ui.appendLog("[GUI] Interface carregada. Conecte a lógica do projeto.");
             ui.setNbBuckets(0);
             ui.setPages(0);
             ui.setTotalTuples(0);
@@ -187,7 +155,6 @@ public class HashIndexUI extends JFrame {
             ui.setScanCost(0);
             ui.setFoundPage(null);
 
-            // Conecta o controller para ligar os botões à lógica
             new HashIndexController(ui);
         });
     }
