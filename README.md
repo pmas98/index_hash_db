@@ -229,7 +229,6 @@ Modifique a classe `DataLoader` ou crie sua própria lógica de carregamento de 
 ## 🎯 Próximos Passos
 
 Esta implementação fornece uma base sólida para o índice hash. A próxima fase seria adicionar:
-- Interface gráfica para visualização
 - Exibição de estatísticas em tempo real
 - Otimização de desempenho
 - Estratégias de resolução de colisões mais sofisticadas
